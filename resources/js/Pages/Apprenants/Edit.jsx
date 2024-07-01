@@ -1,6 +1,10 @@
 import React, { useState } from 'react';
 import { Link } from '@inertiajs/react';
+import { Inertia } from '@inertiajs/inertia';
 import { route } from 'ziggy-js';
+import 'bootstrap/dist/css/bootstrap.min.css';
+import 'font-awesome/css/font-awesome.min.css';
+import '../../../css/style.css'; // Assurez-vous d'inclure le style personnalisé ici
 
 const ApprenantEdit = ({ apprenant }) => {
   const [formData, setFormData] = useState({
@@ -9,20 +13,32 @@ const ApprenantEdit = ({ apprenant }) => {
     age: apprenant.age,
     ville: apprenant.ville,
     email: apprenant.email,
+    image: null,
   });
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prevState) => ({
-      ...prevState,
-      [name]: value,
-    }));
+    const { name, value, type, files } = e.target;
+    if (type === 'file') {
+      setFormData((prevState) => ({
+        ...prevState,
+        [name]: files[0],
+      }));
+    } else {
+      setFormData((prevState) => ({
+        ...prevState,
+        [name]: value,
+      }));
+    }
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    const data = new FormData();
+    for (const key in formData) {
+      data.append(key, formData[key]);
+    }
     // Soumettre les données au backend via Inertia
-    Inertia.put(route('admin.apprenants.update', apprenant.id), formData)
+    Inertia.post(route('admin.apprenants.update', apprenant.id), data)
       .then(() => {
         console.log('Apprenant mis à jour avec succès');
         // Redirection ou autre action après la mise à jour réussie
@@ -97,6 +113,16 @@ const ApprenantEdit = ({ apprenant }) => {
             value={formData.email}
             onChange={handleChange}
             required
+          />
+        </div>
+        <div className="col-md-6">
+          <label htmlFor="image" className="form-label">Image</label>
+          <input
+            type="file"
+            className="form-control"
+            id="image"
+            name="image"
+            onChange={handleChange}
           />
         </div>
         <div className="col-12">

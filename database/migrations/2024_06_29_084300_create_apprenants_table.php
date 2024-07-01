@@ -19,9 +19,12 @@ return new class extends Migration
             $table->string('email')->unique();
             $table->string('ville');
             $table->string('image');
-            $table->string('discipline');
+            $table->unsignedBigInteger('discipline_id'); // Référence à la table disciplines
             $table->string('domicile');
             $table->timestamps();
+
+            // Clé étrangère vers la table disciplines
+            $table->foreign('discipline_id')->references('id')->on('disciplines');
         });
     }
 
